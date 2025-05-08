@@ -1,5 +1,6 @@
 ## EX. NO:2 IMPLEMENTATION OF PLAYFAIR CIPHER
-
+# NAME : Thaanesh
+# REG NO : 212223230228
  
 
 ## AIM:
@@ -34,10 +35,152 @@ STEP-5: Display the obtained cipher text.
 
 
 
-Program:
+# Program:
+
+~~~
+def prepare_text(text):
+    """ Prepare plaintext by replacing 'j' with 'i' and adding 'x' for repeated or odd characters """
+    text = text.lower().replace("j", "i")
+    prepared = ""
+    
+    i = 0
+    while i < len(text):
+        a = text[i]
+        if i + 1 < len(text):
+            b = text[i + 1]
+            if a == b:
+                prepared += a + "x"
+                i += 1
+            else:
+                prepared += a + b
+                i += 2
+        else:
+            prepared += a + "x"
+            i += 1
+
+    if len(prepared) % 2 != 0:
+        prepared += "x"
+
+    return prepared
+
+
+def generate_key_matrix(key):
+    """ Generate the 5x5 key matrix """
+    key = key.lower().replace("j", "i")
+    matrix = []
+    used = set()
+
+    # Fill with key characters
+    for char in key:
+        if char not in used and char.isalpha():
+            used.add(char)
+            matrix.append(char)
+
+    # Fill remaining characters
+    for i in range(26):
+        letter = chr(i + ord('a'))
+        if letter != 'j' and letter not in used:
+            matrix.append(letter)
+
+    # Convert to 5x5 matrix
+    return [matrix[i * 5:(i + 1) * 5] for i in range(5)]
+
+
+def find_position(matrix, char):
+    """ Find the row and column of a character in the matrix """
+    for row in range(5):
+        for col in range(5):
+            if matrix[row][col] == char:
+                return row, col
+    return None
+
+
+def encrypt_pair(matrix, a, b):
+    """ Encrypt a pair of characters """
+    row1, col1 = find_position(matrix, a)
+    row2, col2 = find_position(matrix, b)
+
+    if row1 == row2:
+        # Same row: move right
+        return matrix[row1][(col1 + 1) % 5] + matrix[row2][(col2 + 1) % 5]
+    elif col1 == col2:
+        # Same column: move down
+        return matrix[(row1 + 1) % 5][col1] + matrix[(row2 + 1) % 5][col2]
+    else:
+        # Rectangle swap
+        return matrix[row1][col2] + matrix[row2][col1]
+
+
+def decrypt_pair(matrix, a, b):
+    """ Decrypt a pair of characters """
+    row1, col1 = find_position(matrix, a)
+    row2, col2 = find_position(matrix, b)
+
+    if row1 == row2:
+        # Same row: move left
+        return matrix[row1][(col1 - 1) % 5] + matrix[row2][(col2 - 1) % 5]
+    elif col1 == col2:
+        # Same column: move up
+        return matrix[(row1 - 1) % 5][col1] + matrix[(row2 - 1) % 5][col2]
+    else:
+        # Rectangle swap
+        return matrix[row1][col2] + matrix[row2][col1]
+
+
+def playfair_encrypt(matrix, plaintext):
+    """ Encrypt the plaintext using the Playfair cipher """
+    plaintext = prepare_text(plaintext)
+    ciphertext = ""
+
+    for i in range(0, len(plaintext), 2):
+        ciphertext += encrypt_pair(matrix, plaintext[i], plaintext[i + 1])
+
+    return ciphertext
+
+
+def playfair_decrypt(matrix, ciphertext):
+    """ Decrypt the ciphertext using the Playfair cipher """
+    plaintext = ""
+
+    for i in range(0, len(ciphertext), 2):
+        plaintext += decrypt_pair(matrix, ciphertext[i], ciphertext[i + 1])
+
+    return plaintext
+
+
+# Main function to run the Playfair Cipher
+def main():
+    key = input("Enter the key: ").strip()
+    plaintext = input("Enter the plaintext: ").strip()
+
+    # Generate key matrix
+    matrix = generate_key_matrix(key)
+
+    print("\nKey Matrix:")
+    for row in matrix:
+        print(" ".join(row))
+
+    # Encrypt and decrypt
+    ciphertext = playfair_encrypt(matrix, plaintext)
+    decrypted_text = playfair_decrypt(matrix, ciphertext)
+    
+    print("\nPlain Text:", decrypted_text)
+    print("Encrypted Text:", ciphertext)
+    
+
+
+# Run the program
+if __name__ == "__main__":
+    main()
+
+~~~
 
 
 
 
+# Output:
 
-Output:
+![image](https://github.com/user-attachments/assets/7393de51-7d87-4024-bcfb-896cd823cfec)
+
+# RESULT :
+The playfair substitution method is implemented using c programming
